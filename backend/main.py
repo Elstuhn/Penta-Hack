@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, session
+from backend.src.transformer import *
 app = Flask(__name__)
-
-@app.route('/')
-def hello_world():
-   return 'Hello World'
 
 @app.route('/call', methods=["POST"])
 def answer():
