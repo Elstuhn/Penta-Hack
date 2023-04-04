@@ -11,7 +11,7 @@ function Body() {
   const [data, setData] = useState([]);
 
   async function getData() {
-    let { data: post, error } = await supabase.from("post").select("id");
+    let { data: post, error } = await supabase.from("post").select("*");
 
     console.log(post);
 
