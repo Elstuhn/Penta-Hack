@@ -1,8 +1,13 @@
 from flask import Flask, render_template, request, session
 # from backend.src.transformer import *
+from flask_cors import CORS, cross_origin
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 from supabase import create_client, Client
 supabase: Client = create_client('https://cwoqhbnsiqcvlwypmeaq.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3b3FoYm5zaXFjdmx3eXBtZWFxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MDU4Njk4NywiZXhwIjoxOTk2MTYyOTg3fQ.usQwUGoRsjZQG6W4L8oTpVs0XE9FS4G_rM-0DHVnmpI')
+
+
 
 @app.route('/call', methods=["POST"])
 def answer():
@@ -20,6 +25,7 @@ def answer():
         pass
 
 @app.route('/upload', methods=['POST'])
+@cross_origin()
 def upload():
     if request.method == "POST":
         body = request.get_json()
@@ -30,6 +36,7 @@ def upload():
         school = request.json['school']
         subject = request.json['subject']
         data = supabase.table("post").select("*").execute()
+        # ai summary
         supabase.table('post').insert({
             "sch": school,
             "topic": topic,
