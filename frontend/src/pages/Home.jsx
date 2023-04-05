@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
 
 console.log(import.meta.env.VITE_URL, import.meta.env.VITE_KEY);
 
@@ -14,6 +15,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [school, setSchool] = useState("");
   const [topic, setTopic] = useState("");
+  const [subject, setSubject] = useState("");
   const [data, setData] = useState([]);
   const [file, setFile] = useState("");
 
@@ -48,16 +50,19 @@ function Home() {
   }, [searchValue]);
 
   const handleFileUpload = async () => {
+    const docId = uuidv4();
     try {
       const { data, error } = await supabase.storage
         .from("post")
-        .upload("hi", file);
+        .upload(docId, file);
 
-      if (error) {
-        throw error;
-      }
+      console.log(data);
 
-      console.log("File uploaded successfully", data);
+      if (error) throw error;
+
+      const { data: link } = supabase.storage.from("post").getPublicUrl(docId);
+
+      console.log("File uploaded successfully", link.publicUrl);
     } catch (error) {
       console.error("Error uploading file", error);
     }
@@ -149,6 +154,15 @@ function Home() {
             value={school}
             onChange={(e) => {
               setSchool(e.target.value);
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Subject"
+            className="input input-bordered w-full my-3"
+            value={subject}
+            onChange={(e) => {
+              setSubject(e.target.value);
             }}
           />
           <input
