@@ -25,5 +25,5 @@ for page_num in range(pdf_reader.getNumPages()):
     text_content += page.extractText()
 
 # Print the extracted text content
-text_content.replace('  ', ' ')
+text_content = text_content.replace('  ', ' ')
 print(text_content)

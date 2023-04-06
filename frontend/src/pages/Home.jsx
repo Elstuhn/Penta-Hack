@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 console.log(import.meta.env.VITE_URL, import.meta.env.VITE_KEY);
 
@@ -14,6 +17,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [school, setSchool] = useState("");
   const [topic, setTopic] = useState("");
+  const [subject, setSubject] = useState("");
   const [data, setData] = useState([]);
   const [file, setFile] = useState("");
 
@@ -36,6 +40,7 @@ function Home() {
       );
 
     if (error) {
+      toast.error("Error fetching data");
       console.log("Error fetching data:", error);
     } else {
       setData(post);
@@ -47,18 +52,57 @@ function Home() {
     getData(searchValue);
   }, [searchValue]);
 
+  // function usePosts(file_url) {
+  //   return useQuery("posts", async () => {
+  //     const { data } = await axios.post("http://127.0.0.1:5000/upload", {
+  //       file_url: file_url,
+  //       topic: topic,
+  //       school: school,
+  //       subject: subject,
+  //     });
+  //     return data;
+  //   });
+  // }
+
   const handleFileUpload = async () => {
+    if (!file || !school || !subject || !topic)
+      return toast.error("Please fill all fields");
+    const docId = uuidv4();
     try {
       const { data, error } = await supabase.storage
         .from("post")
-        .upload("hi", file);
+        .upload(docId, file);
 
-      if (error) {
-        throw error;
-      }
+      console.log(data);
 
-      console.log("File uploaded successfully", data);
+      if (error) throw error;
+
+      const { data: link } = supabase.storage.from("post").getPublicUrl(docId);
+
+      console.log("File uploaded successfully", link.publicUrl);
+
+      const { data: upload } = await axios.post(
+        "http://127.0.0.1:5000/upload",
+        {
+          file_url: link.publicUrl,
+          topic: topic,
+          school: school,
+          subject: subject,
+        }
+      );
+
+      console.log(upload);
+
+      document.getElementById("my-modal-4").checked = false;
+
+      setFile("");
+      setSchool("");
+      setSubject("");
+      setTopic("");
+
+      getData(searchValue);
     } catch (error) {
+      toast.error("Error uploading file");
       console.error("Error uploading file", error);
     }
   };
@@ -153,6 +197,15 @@ function Home() {
           />
           <input
             type="text"
+            placeholder="Subject"
+            className="input input-bordered w-full my-3"
+            value={subject}
+            onChange={(e) => {
+              setSubject(e.target.value);
+            }}
+          />
+          <input
+            type="text"
             placeholder="Topic"
             className="input input-bordered w-full my-3 mb-6"
             value={topic}
@@ -163,7 +216,13 @@ function Home() {
           <div className="flex justify-between">
             <input
               type="file"
+              accept=".pdf"
               onChange={(e) => {
+                if (e.target.files[0].type !== "application/pdf") {
+                  e.target.value = null;
+                  return toast.error("Only pdf files are allowed");
+                }
+
                 setFile(e.target.files[0]);
               }}
               className="file-input w-full max-w-xs"
