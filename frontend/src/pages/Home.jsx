@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import toast from "react-hot-toast";
+import supabase from "../api/supabase";
 
-console.log(import.meta.env.VITE_URL, import.meta.env.VITE_KEY);
-
-const supabase = createClient(
-  import.meta.env.VITE_URL,
-  import.meta.env.VITE_KEY
-);
+import useAuth from "../hooks/useAuth";
 
 function Home() {
+  const { auth, setAuth } = useAuth();
+
   const [searchValue, setSearchValue] = useState("");
   const [searchTemp, setSearchTemp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [school, setSchool] = useState("");
   const [topic, setTopic] = useState("");
   const [subject, setSubject] = useState("");
@@ -31,13 +29,30 @@ function Home() {
     return () => clearTimeout(timer);
   }, [searchTemp]);
 
+  async function getMyPosts() {
+    let { data: myPosts, error } = await supabase
+      .from("post")
+      .select("sch,topic,sub,data,users(username)")
+      .eq("users.id", auth.user.id);
+    console.log("ledata", myPosts);
+
+    if (error) {
+      toast.error("Error fetching data");
+      console.log("Error fetching data:", error);
+    } else {
+      console.log(myPosts);
+    }
+  }
+
   async function getData(search) {
+    console.log(supabase);
     let { data: post, error } = await supabase
       .from("post")
-      .select()
+      .select("sch,topic,sub,data,users(username)")
       .or(
         `data.ilike.%${search}%,topic.ilike.%${search}%,sub.ilike.%${search}%,sch.ilike.%${search}%`
       );
+    console.log("ledata", post);
 
     if (error) {
       toast.error("Error fetching data");
@@ -49,6 +64,11 @@ function Home() {
   }
 
   useEffect(() => {
+    if (auth?.user) getMyPosts();
+  }, [auth?.user]);
+
+  useEffect(() => {
+    console.log("reloading");
     getData(searchValue);
   }, [searchValue]);
 
@@ -65,8 +85,10 @@ function Home() {
   // }
 
   const handleFileUpload = async () => {
+    if (!auth.user.id) return toast.error("You are not logged in!");
     if (!file || !school || !subject || !topic)
       return toast.error("Please fill all fields");
+    setIsUploading(true);
     const docId = uuidv4();
     try {
       const { data, error } = await supabase.storage
@@ -88,8 +110,11 @@ function Home() {
           topic: topic,
           school: school,
           subject: subject,
+          user_id: auth.user.id,
         }
       );
+
+      setIsUploading(false);
 
       console.log(upload);
 
@@ -102,6 +127,7 @@ function Home() {
 
       getData(searchValue);
     } catch (error) {
+      setIsUploading(false);
       toast.error("Error uploading file");
       console.error("Error uploading file", error);
     }
@@ -145,9 +171,11 @@ function Home() {
             />
           </div>
 
-          <label htmlFor="my-modal-4" className="ml-2 btn">
-            Submit a Request
-          </label>
+          {auth?.user && (
+            <label htmlFor="my-modal-4" className="ml-2 btn">
+              Submit a Request
+            </label>
+          )}
         </div>
 
         {data.map((item, index) => (
@@ -162,7 +190,7 @@ function Home() {
                 <span className="card-title justify-self-start">
                   {
                     <>
-                      <p className="font-medium">
+                      <p className="font-medium text-xl">
                         {highlightSubstrings(item.topic)}
                       </p>
                     </>
@@ -173,13 +201,24 @@ function Home() {
                 </span>
               </div>
 
-              <p className=""> {highlightSubstrings(item.data)}</p>
-              <div className="flex justify-end font-semibold">
+              <p className="mb-5"> {highlightSubstrings(item.data)}</p>
+              <div className="flex justify-between font-semibold">
+                <span className="justify-self-end">
+                  <span className="font-light">Posted by </span>
+                  {item.users.username}
+                </span>
                 <span className="justify-self-end">{item.sch}</span>
               </div>
             </div>
           </div>
         ))}
+      </div>
+      <div>
+        <div className="card bg-neutral text-neutral-content">
+          <div className="card-body">
+            <h2 className="card-title">My Posts</h2>
+          </div>
+        </div>
       </div>
 
       <input type="checkbox" id="my-modal-4" className="modal-toggle" />
@@ -230,7 +269,9 @@ function Home() {
               id="file"
             />
             <button
-              className="btn btn-primary justify-self-end"
+              className={`btn btn-primary justify-self-end ${
+                isUploading ? "loading" : ""
+              }`}
               onClick={() => handleFileUpload()}
             >
               Upload
