@@ -40,16 +40,16 @@ function Home() {
 
   async function getMyPosts() {
     try {
-      console.log("id", auth.user.id);
+      // console.log("id", auth.user.id);
       let { data: myPosts, error } = await supabase
         .from("post")
-        .select("id,sch,topic,sub,data,users(username)")
+        .select("id,sch,topic,sub,data,users(username),sum")
         .eq("user_id", auth.user.id);
 
       if (error) {
         throw error;
       }
-      console.log(myPosts);
+      // console.log(myPosts);
       setMyPosts(myPosts);
     } catch (error) {
       toast.error("Error fetching data");
@@ -58,14 +58,14 @@ function Home() {
   }
 
   async function getData(search) {
-    console.log(supabase);
+    // console.log(supabase);
     let { data: post, error } = await supabase
       .from("post")
       .select("sch,topic,sub,data,users(username),sum")
       .or(
         `data.ilike.%${search}%,topic.ilike.%${search}%,sub.ilike.%${search}%,sch.ilike.%${search}%`
       );
-    console.log("ledata", post);
+    // console.log("ledata", post);
 
     if (error) {
       toast.error("Error fetching data");
@@ -82,7 +82,7 @@ function Home() {
   }, [auth?.user]);
 
   useEffect(() => {
-    console.log("reloading");
+    // console.log("reloading");
     getData(searchValue);
   }, [searchValue]);
 
@@ -110,13 +110,13 @@ function Home() {
         .from("post")
         .upload(docId, file);
 
-      console.log(data);
+      // console.log(data);
 
       if (error) throw error;
 
       const { data: link } = supabase.storage.from("post").getPublicUrl(docId);
 
-      console.log("File uploaded successfully", link.publicUrl);
+      // console.log("File uploaded successfully", link.publicUrl);
 
       const { data: upload } = await axios.post(
         "http://127.0.0.1:5000/upload",
@@ -131,7 +131,7 @@ function Home() {
 
       setIsUploading(false);
 
-      console.log(upload);
+      // console.log(upload);
 
       document.getElementById("my-modal-4").checked = false;
 
@@ -147,7 +147,7 @@ function Home() {
       console.error("Error uploading file", error);
     }
   };
-  console.log(file);
+  // console.log(file);
 
   const highlightSubstrings = (text) => {
     if (!searchValue) {
@@ -166,7 +166,19 @@ function Home() {
       )
     );
   };
-  console.log(data);
+  // console.log(data);
+
+  const handleDelete = async (id) => {
+    try {
+      console.log("hi", id);
+      await supabase.from("post").delete().eq("id", id.toString());
+      toast.success("Post deleted");
+    } catch (error) {
+      toast.error("Error deleting post");
+      console.log(error);
+    }
+    getData(searchValue);
+  };
 
   return (
     <>
@@ -217,7 +229,9 @@ function Home() {
                     {item.sub}
                   </span>
                 </div>
-
+                <a href={item.data} className="underline">
+                  Orignal Document
+                </a>
                 <p className="mb-5"> {highlightSubstrings(item.sum)}</p>
                 <div className="flex justify-between font-semibold">
                   <span className="justify-self-end">
@@ -232,7 +246,7 @@ function Home() {
         </div>
         <div>
           <div className="mb-5 card bg-neutral text-neutral-content">
-            <div className="card-body">
+            <div className="p-4 card-body">
               {auth?.user ? (
                 <h2 className="card-title">My Posts</h2>
               ) : (
@@ -244,10 +258,10 @@ function Home() {
           {myPosts.map((post) => (
             <div key={post.id}>
               <label
-                className="w-full mb-2 btn btn-ghost"
+                className="w-full mb-2 btn btn-outline"
                 onClick={() => handleOpen(post)}
               >
-                <span className="text-zinc-800">{post.topic}</span>
+                <span>{post.topic}</span>
               </label>
             </div>
           ))}
@@ -318,8 +332,18 @@ function Home() {
           <input type="checkbox" id="my-modal-5" className="modal-toggle" />
           <label htmlFor="my-modal-5" className="w-full cursor-pointer modal">
             <label className="relative max-w-screen-xl modal-box" htmlFor="">
-              <h3 className="text-lg font-bold">{selectedData?.topic}</h3>
-              <p className="py-4 break-words">{selectedData?.data}</p>
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold">{selectedData?.topic}</h3>
+                <button
+                  className="btn btn-error btn-outline"
+                  onClick={() => {
+                    handleDelete(selectedData?.id);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+              <p className="py-4 break-words">{selectedData?.sum}</p>
             </label>
           </label>
         </div>

@@ -27,57 +27,57 @@ function Login() {
       });
 
       if (error) throw error;
-      console.log(data);
+      // console.log(data);
 
       navigate("/");
     } catch (error) {
       console.error(error);
       toast.error("Invalid username or password");
     }
-    console.log(email, password);
+    // console.log(email, password);
   };
 
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="flex items-center justify-center h-screen">
       <form
-        className="card w-1/3 bg-neutral text-neutral-content"
+        className="w-1/3 card bg-neutral text-neutral-content"
         onSubmit={onHandleSubmit}
       >
-        <div className="card-body items-center text-center">
+        <div className="items-center text-center card-body">
           <h2 className="card-title">Login</h2>
 
-          <div className="form-control w-full max-w-xs">
+          <div className="w-full max-w-xs form-control">
             <label className="label">
               <span className="label-text">E-mail</span>
             </label>
             <input
               type="email"
               placeholder="Type here"
-              className="input input-bordered w-full max-w-xs"
+              className="w-full max-w-xs input input-bordered"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="form-control w-full max-w-xs">
+          <div className="w-full max-w-xs form-control">
             <label className="label">
               <span className="label-text">Password</span>
             </label>
             <input
               type="password"
               placeholder="Type here"
-              className="input input-bordered w-full max-w-xs mb-5"
+              className="w-full max-w-xs mb-5 input input-bordered"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          <div className="card-actions w-full justify-center">
-            <button className="btn btn-primary w-2/3">Login</button>
+          <div className="justify-center w-full card-actions">
+            <button className="w-2/3 btn btn-primary">Login</button>
           </div>
           <div className="divider"></div>
 
           <button
-            className="btn btn-info w-2/3"
+            className="w-2/3 btn btn-info"
             onClick={() => navigate("/register")}
           >
             Register

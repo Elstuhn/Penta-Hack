@@ -21,7 +21,7 @@ function Header() {
           <label tabIndex={0} className="btn btn-ghost btn-circle">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              className="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -36,7 +36,7 @@ function Header() {
           </label>
           <ul
             tabIndex={0}
-            className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+            className="p-2 mt-3 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
           >
             <li>
               <a onClick={() => navigate("/")}>Home</a>
@@ -51,18 +51,20 @@ function Header() {
         </div>
       </div>
       <div className="navbar-center">
-        <a className="btn btn-ghost normal-case text-xl">ANONotes</a>
+        <a href="/" className="text-xl normal-case btn btn-ghost">
+          ReLuNotes
+        </a>
       </div>
-      <div className="navbar-end mr-5">
+      <div className="mr-5 navbar-end">
         {!auth?.user ? (
           <a
-            className="btn btn-square btn-ghost"
+            className="btn whitespace-nowrap"
             onClick={() => navigate("/login")}
           >
-            <span>Log in</span>
+            Log in
           </a>
         ) : (
-          <ul className="menu menu-horizontal px-1">
+          <ul className="px-1 menu menu-horizontal">
             <li tabIndex={0}>
               <a>
                 <span>
@@ -92,7 +94,7 @@ function Header() {
           <div className="indicator">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              className="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

@@ -39,7 +39,7 @@ function App() {
   //   getUser();
   // }, []);
 
-  console.log("session", auth);
+  // console.log("session", auth);
 
   return (
     <html data-theme="dark">
