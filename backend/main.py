@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 # from backend.src.transformer import *
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
@@ -9,19 +10,23 @@ supabase: Client = create_client('https://cwoqhbnsiqcvlwypmeaq.supabase.co', 'ey
 
 from src.utils.ocr import pdfToTxt
 
+def predict(text):
+    tokens_input = tokenizer.encode("summarize: "+text, return_tensors='pt', max_length=512, truncation=True)
+    ids = model.generate(tokens_input, min_length=30, max_length=256)
+    summary = tokenizer.decode(ids[0], skip_special_tokens=True)
+    return summary
 
 @app.route('/call', methods=["POST"])
 def answer():
     if request.method == "POST":
         data = request.data 
         data = data.decode("utf-8")
-        data = eval(data)
+        data = eval(data) #data should only have one argument
         try:
-            f, fprime, points = grad_desc(*[data[i] for i in data])
+            summary = predict(data[0]) #data[0] to get text
         except Exception as e:
             return {"status" : 0, "error": f"{type(e)} {e}"}
-        fprime = str(fprime)
-        return {"f": f, "fprime": fprime, "points": points, "status": 1}
+        return {"summary": summary}
     else:
         pass
 
@@ -54,4 +59,6 @@ def upload():
         pass
 
 if __name__ == '__main__':
+    tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
+    model = AutoModelForSeq2SeqLM.from_pretrained("facebook/bart-large-cnn")
     app.run(debug = True)
