@@ -20,12 +20,13 @@ Our project uses the following resources:
 
 - Tech stacks such as Supabase, ReactJS and TailwindCSS for the frontend 
 
-## Usage (cant use without vite key and vite url)
+## Usage
 1. cd into the folder
 2. pip install -r requirements.txt
 3. cd into backend and run main.py (will start downloading model)
 4. go to the localhost link provided and register
 5. login to your account and upload any PDF document 
+(cant use without vite key and vite url which are deleted for security reasons)
 
 ## Contribution
 We welcome contributions to our project! If you are interested in contributing, please submit a pull request with your changes.
