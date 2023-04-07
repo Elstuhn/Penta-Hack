@@ -14,9 +14,11 @@ Our project uses the following resources:
 
 - [Pre-trained NLP Transformer model from Facebook (BART)](https://arxiv.org/abs/1910.13461)
 
-Python libraries such as PyTorch and TensorFlow for building and training our deep learning model
-PDF parsing libraries like PyPDF2 and PDFMiner for extracting the content of the PDFs
-Tech stacks such as Supabase, ReactJS and TailwindCSS for the frontend 
+- Python libraries such as PyTorch and TensorFlow for building and training our deep learning model
+
+- PDF parsing libraries like PyPDF2 and PDFMiner for extracting the content of the PDFs
+
+- Tech stacks such as Supabase, ReactJS and TailwindCSS for the frontend 
 
 ## Usage
 1. cd into the folder
