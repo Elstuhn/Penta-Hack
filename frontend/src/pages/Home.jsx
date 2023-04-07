@@ -40,10 +40,11 @@ function Home() {
 
   async function getMyPosts() {
     try {
+      console.log("id", auth.user.id);
       let { data: myPosts, error } = await supabase
         .from("post")
         .select("id,sch,topic,sub,data,users(username)")
-        .eq("users.id", auth.user.id);
+        .eq("user_id", auth.user.id);
 
       if (error) {
         throw error;
@@ -60,7 +61,7 @@ function Home() {
     console.log(supabase);
     let { data: post, error } = await supabase
       .from("post")
-      .select("sch,topic,sub,data,users(username)")
+      .select("sch,topic,sub,data,users(username),sum")
       .or(
         `data.ilike.%${search}%,topic.ilike.%${search}%,sub.ilike.%${search}%,sch.ilike.%${search}%`
       );
@@ -98,6 +99,7 @@ function Home() {
   // }
 
   const handleFileUpload = async () => {
+    if (isUploading) return;
     if (!auth.user.id) return toast.error("You are not logged in!");
     if (!file || !school || !subject || !topic)
       return toast.error("Please fill all fields");
@@ -164,20 +166,21 @@ function Home() {
       )
     );
   };
+  console.log(data);
 
   return (
     <>
       <div
-        className="bg-slate-500 grid grid-cols-2 gap-6 p-10"
+        className="grid grid-cols-2 gap-6 p-10 bg-slate-500"
         style={{ gridTemplateColumns: "70% 30%" }}
       >
         <div>
           <div className="flex flex-row">
-            <div className="form-control w-full">
+            <div className="w-full form-control">
               <input
                 type="text"
                 placeholder="Search"
-                className="input input-bordered w-full"
+                className="w-full input input-bordered"
                 value={searchTemp}
                 onChange={(e) => {
                   setSearchTemp(e.target.value);
@@ -204,7 +207,7 @@ function Home() {
                   <span className="card-title justify-self-start">
                     {
                       <>
-                        <p className="font-medium text-xl">
+                        <p className="text-xl font-medium break-words">
                           {highlightSubstrings(item.topic)}
                         </p>
                       </>
@@ -215,7 +218,7 @@ function Home() {
                   </span>
                 </div>
 
-                <p className="mb-5"> {highlightSubstrings(item.data)}</p>
+                <p className="mb-5"> {highlightSubstrings(item.sum)}</p>
                 <div className="flex justify-between font-semibold">
                   <span className="justify-self-end">
                     <span className="font-light">Posted by </span>
@@ -228,7 +231,7 @@ function Home() {
           ))}
         </div>
         <div>
-          <div className="card bg-neutral text-neutral-content mb-5">
+          <div className="mb-5 card bg-neutral text-neutral-content">
             <div className="card-body">
               {auth?.user ? (
                 <h2 className="card-title">My Posts</h2>
@@ -241,7 +244,7 @@ function Home() {
           {myPosts.map((post) => (
             <div key={post.id}>
               <label
-                className="btn btn-ghost w-full mb-2"
+                className="w-full mb-2 btn btn-ghost"
                 onClick={() => handleOpen(post)}
               >
                 <span className="text-zinc-800">{post.topic}</span>
@@ -251,13 +254,13 @@ function Home() {
         </div>
 
         <input type="checkbox" id="my-modal-4" className="modal-toggle" />
-        <label htmlFor="my-modal-4" className="modal cursor-pointer">
-          <label className="modal-box relative" htmlFor="">
-            <h2 className="text-xl font-bold mb-3">Create new post</h2>
+        <label htmlFor="my-modal-4" className="cursor-pointer modal">
+          <label className="relative modal-box" htmlFor="">
+            <h2 className="mb-3 text-xl font-bold">Create new post</h2>
             <input
               type="text"
               placeholder="School"
-              className="input input-bordered w-full my-3"
+              className="w-full my-3 input input-bordered"
               value={school}
               onChange={(e) => {
                 setSchool(e.target.value);
@@ -266,7 +269,7 @@ function Home() {
             <input
               type="text"
               placeholder="Subject"
-              className="input input-bordered w-full my-3"
+              className="w-full my-3 input input-bordered"
               value={subject}
               onChange={(e) => {
                 setSubject(e.target.value);
@@ -275,7 +278,7 @@ function Home() {
             <input
               type="text"
               placeholder="Topic"
-              className="input input-bordered w-full my-3 mb-6"
+              className="w-full my-3 mb-6 input input-bordered"
               value={topic}
               onChange={(e) => {
                 setTopic(e.target.value);
@@ -293,7 +296,7 @@ function Home() {
 
                   setFile(e.target.files[0]);
                 }}
-                className="file-input w-full max-w-xs"
+                className="w-full max-w-xs file-input"
                 name="file"
                 id="file"
               />
@@ -302,8 +305,9 @@ function Home() {
                   isUploading ? "loading" : ""
                 }`}
                 onClick={() => handleFileUpload()}
+                disabled={isUploading}
               >
-                Upload
+                {isUploading ? "Posting..." : "Upload"}
               </button>
             </div>
           </label>
@@ -312,8 +316,8 @@ function Home() {
       {selectedData && (
         <div className="flex w-full">
           <input type="checkbox" id="my-modal-5" className="modal-toggle" />
-          <label htmlFor="my-modal-5" className="modal cursor-pointer w-full">
-            <label className="modal-box relative max-w-screen-xl" htmlFor="">
+          <label htmlFor="my-modal-5" className="w-full cursor-pointer modal">
+            <label className="relative max-w-screen-xl modal-box" htmlFor="">
               <h3 className="text-lg font-bold">{selectedData?.topic}</h3>
               <p className="py-4 break-words">{selectedData?.data}</p>
             </label>
