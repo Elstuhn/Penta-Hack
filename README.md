@@ -27,5 +27,7 @@ Our project uses the following resources:
 4. go to the localhost link provided and register
 5. login to your account and upload any PDF document 
 
+(cant use without vite key and vite url which are deleted for security reasons)
+
 ## Contribution
 We welcome contributions to our project! If you are interested in contributing, please submit a pull request with your changes.
