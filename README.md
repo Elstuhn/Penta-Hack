@@ -26,6 +26,7 @@ Our project uses the following resources:
 3. cd into backend and run main.py (will start downloading model)
 4. go to the localhost link provided and register
 5. login to your account and upload any PDF document 
+
 (cant use without vite key and vite url which are deleted for security reasons)
 
 ## Contribution
