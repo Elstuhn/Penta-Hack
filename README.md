@@ -10,9 +10,9 @@ The goal of this project is to provide an efficient and time-saving solution for
 ## Resources
 Our project uses the following resources:
 
-[A dataset of wikipedia descriptions and summary for training and evaluation purposes](https://huggingface.co/datasets/jordiclive/wikipedia-summary-dataset)
+- [A dataset of wikipedia descriptions and summary for training and evaluation purposes](https://huggingface.co/datasets/jordiclive/wikipedia-summary-dataset)
 
-[Pre-trained NLP Transformer model from Facebook (BART)](https://arxiv.org/abs/1910.13461)
+- [Pre-trained NLP Transformer model from Facebook (BART)](https://arxiv.org/abs/1910.13461)
 
 Python libraries such as PyTorch and TensorFlow for building and training our deep learning model
 PDF parsing libraries like PyPDF2 and PDFMiner for extracting the content of the PDFs
