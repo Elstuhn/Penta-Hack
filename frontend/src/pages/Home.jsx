@@ -40,10 +40,11 @@ function Home() {
 
   async function getMyPosts() {
     try {
+      console.log("id", auth.user.id);
       let { data: myPosts, error } = await supabase
         .from("post")
         .select("id,sch,topic,sub,data,users(username)")
-        .eq("users.id", auth.user.id);
+        .eq("user_id", auth.user.id);
 
       if (error) {
         throw error;
@@ -204,7 +205,7 @@ function Home() {
                   <span className="card-title justify-self-start">
                     {
                       <>
-                        <p className="font-medium text-xl">
+                        <p className="font-medium text-xl break-words">
                           {highlightSubstrings(item.topic)}
                         </p>
                       </>
@@ -215,7 +216,9 @@ function Home() {
                   </span>
                 </div>
 
-                <p className="mb-5"> {highlightSubstrings(item.data)}</p>
+                <p className="mb-5 break-words">
+                  {highlightSubstrings(item.data)}
+                </p>
                 <div className="flex justify-between font-semibold">
                   <span className="justify-self-end">
                     <span className="font-light">Posted by </span>
