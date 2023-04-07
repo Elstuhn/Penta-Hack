@@ -99,6 +99,7 @@ function Home() {
   // }
 
   const handleFileUpload = async () => {
+    if (isUploading) return;
     if (!auth.user.id) return toast.error("You are not logged in!");
     if (!file || !school || !subject || !topic)
       return toast.error("Please fill all fields");
@@ -304,8 +305,9 @@ function Home() {
                   isUploading ? "loading" : ""
                 }`}
                 onClick={() => handleFileUpload()}
+                disabled={isUploading}
               >
-                Upload
+                {isUploading ? "Posting..." : "Upload"}
               </button>
             </div>
           </label>
