@@ -22,11 +22,40 @@ def answer():
         data = request.data 
         data = data.decode("utf-8")
         data = eval(data) #data should only have one argument
+
         try:
-            summary = predict(data[0]) #data[0] to get text
+            summary = predict(text) #data[0] to get text
         except Exception as e:
             return {"status" : 0, "error": f"{type(e)} {e}"}
         return {"summary": summary}
+    else:
+        pass
+
+def getSummary(text):
+    slit = text.split(" ")
+    slit = [slit[i:i + 512] for i in range(0, len(slit), 512)]
+    summary = ""
+    for i in slit:
+        summary += predict(" ".join(i))
+
+    return summary 
+
+@app.route('/api/summarise', methods=['POST'])
+def summarise():
+    if request.method == "POST":
+        body = request.get_json()
+        if ('text' not in body):
+            return ('invalid body', 400)
+        text = request.json['text']
+      
+        slit = text.split(" ")
+        slit = [slit[i:i + 512] for i in range(0, len(slit), 512)]
+        summary = ""
+        print(summary)
+        for i in slit:
+            summary += predict(" ".join(i))
+
+        return summary
     else:
         pass
 
@@ -45,6 +74,7 @@ def upload():
         data = supabase.table("post").select("*").execute()
         txt = pdfToTxt(file_url)
         print(txt)
+        summary = getSummary(txt)
         # ai summary
         supabase.table('post').insert({
             "sch": school,
@@ -52,6 +82,7 @@ def upload():
             "sub": subject,
             "data": file_url,
             "user_id": user_id,
+            "sum": summary
         }).execute()
         # file.save(file.filename)
         return data.json()
