@@ -42,19 +42,21 @@ function App() {
   console.log("session", auth);
 
   return (
-    <div className="App">
-      <Toaster />
-      <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/quiz" element={<Quiz />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <html data-theme="dark">
+      <div className="App">
+        <Toaster />
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/quiz" element={<Quiz />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </html>
   );
 }
 

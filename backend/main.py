@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+# from src.utils.transformer import AutoTokenizer, AutoModelForSeq2SeqLM
 # from backend.src.transformer import *
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
@@ -59,6 +59,6 @@ def upload():
         pass
 
 if __name__ == '__main__':
-    tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
-    model = AutoModelForSeq2SeqLM.from_pretrained("facebook/bart-large-cnn")
+    # tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
+    # model = AutoModelForSeq2SeqLM.from_pretrained("facebook/bart-large-cnn")
     app.run(debug = True)
