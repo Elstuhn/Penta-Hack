@@ -8,6 +8,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 from supabase import create_client, Client
 supabase: Client = create_client('https://cwoqhbnsiqcvlwypmeaq.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3b3FoYm5zaXFjdmx3eXBtZWFxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4MDU4Njk4NywiZXhwIjoxOTk2MTYyOTg3fQ.usQwUGoRsjZQG6W4L8oTpVs0XE9FS4G_rM-0DHVnmpI')
 
+from src.utils.ocr import pdfToTxt
 
 def predict(text):
     tokens_input = tokenizer.encode("summarize: "+text, return_tensors='pt', max_length=512, truncation=True)
@@ -40,13 +41,17 @@ def upload():
         topic = request.json['topic']
         school = request.json['school']
         subject = request.json['subject']
+        user_id = request.json['user_id']
         data = supabase.table("post").select("*").execute()
+        txt = pdfToTxt(file_url)
+        print(txt)
         # ai summary
         supabase.table('post').insert({
             "sch": school,
             "topic": topic,
             "sub": subject,
-            "data": file_url
+            "data": file_url,
+            "user_id": user_id,
         }).execute()
         # file.save(file.filename)
         return data.json()
