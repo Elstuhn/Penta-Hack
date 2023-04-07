@@ -20,7 +20,7 @@ Our project uses the following resources:
 
 - Tech stacks such as Supabase, ReactJS and TailwindCSS for the frontend 
 
-## Usage
+## Usage (cant use without vite key and vite url)
 1. cd into the folder
 2. pip install -r requirements.txt
 3. cd into backend and run main.py (will start downloading model)
